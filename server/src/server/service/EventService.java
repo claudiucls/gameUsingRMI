@@ -33,7 +33,7 @@ public class EventService {
 
         queue.add(joinEvent);
 
-        //TODO: notify new event was added
+        notifyForEvents(gameId);
     }
 
     public List<GameEvent> getEvents(String gameId) {

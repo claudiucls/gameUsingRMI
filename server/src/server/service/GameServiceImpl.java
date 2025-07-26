@@ -94,6 +94,8 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
     public Question answer(Answer answer) throws RemoteException {
         // TODO : validarea raspunsului
 
+        eventService.addAnswerEvent(answer);
+
         waitForGame(answer.getGameId());
 
         return gameRepository.getCurrentQuestion(answer.getGameId());
