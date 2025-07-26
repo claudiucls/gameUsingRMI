@@ -4,4 +4,8 @@ module lib {
     // transitive, vor avea o dependinta si de
     // modulul java.rmi
     requires transitive java.rmi;
+
+    exports lib.service;
+    exports lib.event;
+    exports lib.model;
 }
