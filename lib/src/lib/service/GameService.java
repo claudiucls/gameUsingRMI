@@ -2,6 +2,7 @@ package lib.service;
 
 import lib.event.GameEvent;
 import lib.model.Answer;
+import lib.model.Player;
 import lib.model.Question;
 
 import java.rmi.Remote;
@@ -16,7 +17,7 @@ public interface GameService extends Remote {
     Question nextQuestion(String gameId) throws RemoteException;
 
     // pentru player
-    Question joinGame(String gameId) throws RemoteException;
+    Question joinGame(String gameId, Player player) throws RemoteException;
     Question answer(Answer answer) throws RemoteException;
 
     // pentru server

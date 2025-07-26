@@ -2,26 +2,46 @@ package server.service;
 
 import lib.event.GameEvent;
 import lib.model.Answer;
+import lib.model.Game;
+import lib.model.Player;
 import lib.model.Question;
 import lib.service.GameService;
+import server.repository.GameRepository;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
 
 public class GameServiceImpl extends UnicastRemoteObject implements GameService {
+
+    private GameRepository  gameRepository;
+
+    private EventService eventService;
+
+    private Map<String, CyclicBarrier> monitors = new ConcurrentHashMap<>();
+
 
     public GameServiceImpl() throws RemoteException {
     }
 
     @Override
     public String createGame(List<Question> questions) throws RemoteException {
-        return "";
+        Game game = gameRepository.createGame(questions);
+        monitors.put(game.getId(), new CyclicBarrier(Integer.MAX_VALUE));
+
+        eventService.createEventQueue(game.getId());
+        return game.getId();
     }
 
     @Override
     public Question startGame(String gameId) throws RemoteException {
-        return null;
+        notifyForGame(gameId);
+
+        return gameRepository.getCurrentQuestion(gameId);
     }
 
     @Override
@@ -30,8 +50,41 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
     }
 
     @Override
-    public Question joinGame(String gameId) throws RemoteException {
-        return null;
+    public Question joinGame(String gameId, Player player) throws RemoteException {
+        Game game = gameRepository.findById(gameId);
+        synchronized (game){
+            boolean exists = game.getPlayers().stream()
+                    .anyMatch(p -> p.equals(player));
+            if (!exists){
+                game.addPlayer(player);
+            } else {
+                throw new IllegalArgumentException("numele exsista");
+            }
+        }
+
+        eventService.addJoinEvent(gameId, player);
+
+        waitForGame(gameId);
+
+        return gameRepository.getNextQuestion(gameId);
+
+    }
+
+    private void waitForGame(String gameId) {
+        CyclicBarrier monitor = monitors.get(gameId);
+        try {
+            monitor.await();
+        } catch (InterruptedException | BrokenBarrierException e){
+           // empty
+        }
+
+
+    }
+
+    private void notifyForGame(String gameId){
+        CyclicBarrier monitor = monitors.get(gameId);
+
+        monitor.reset();
     }
 
     @Override
