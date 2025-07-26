@@ -33,6 +33,10 @@ public class Game implements Serializable {
         return Set.copyOf(players);
     }
 
+    public void addPlayer(Player p){
+        players.add(p);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
