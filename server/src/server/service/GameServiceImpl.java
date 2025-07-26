@@ -46,7 +46,10 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
 
     @Override
     public Question nextQuestion(String gameId) throws RemoteException {
-        return null;
+        Question nextQuestion = gameRepository.getNextQuestion(gameId);
+        notifyForGame(gameId);
+
+        return nextQuestion;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
 
         waitForGame(gameId);
 
-        return gameRepository.getNextQuestion(gameId);
+        return gameRepository.getCurrentQuestion(gameId);
 
     }
 
@@ -89,11 +92,15 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
 
     @Override
     public Question answer(Answer answer) throws RemoteException {
-        return null;
+        // TODO : validarea raspunsului
+
+        waitForGame(answer.getGameId());
+
+        return gameRepository.getCurrentQuestion(answer.getGameId());
     }
 
     @Override
     public List<GameEvent> getEvents(String gameId) throws RemoteException {
-        return List.of();
+        return eventService.getEvents(gameId);
     }
 }
