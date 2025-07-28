@@ -1,5 +1,7 @@
 package server;
 
+import server.repository.GameRepository;
+import server.service.EventService;
 import server.service.GameServiceImpl;
 
 import java.rmi.RemoteException;
@@ -11,7 +13,10 @@ public class MainServer {
     public static void main(String[] args) throws RemoteException {
         Registry registry = LocateRegistry.createRegistry(4545);
 
-        registry.rebind("gameService", new GameServiceImpl());
+        registry.rebind("gameService", new GameServiceImpl(
+                new GameRepository(),
+                new EventService()
+        ));
     }
 
 }

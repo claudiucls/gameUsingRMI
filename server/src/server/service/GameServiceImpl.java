@@ -24,8 +24,9 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
 
     private Map<String, CyclicBarrier> monitors = new ConcurrentHashMap<>();
 
-
-    public GameServiceImpl() throws RemoteException {
+    public GameServiceImpl(GameRepository gameRepository, EventService eventService) throws RemoteException {
+        this.gameRepository = gameRepository;
+        this.eventService = eventService;
     }
 
     @Override

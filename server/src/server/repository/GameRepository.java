@@ -10,11 +10,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GameRepository {
 
-    private static AtomicInteger idGenerator = new AtomicInteger(0);
+    private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
-    private Map<String, Game> games = new ConcurrentHashMap<>();
+    private final Map<String, Game> games = new ConcurrentHashMap<>();
 
-    private Map<String, Integer> currentQuestion = new ConcurrentHashMap<>();
+    private final Map<String, Integer> currentQuestion = new ConcurrentHashMap<>();
 
     public Game createGame(List<Question> questions){
         int nextId = idGenerator.getAndIncrement();
@@ -43,13 +43,17 @@ public class GameRepository {
         }
     }
 
-    public Question getCurrentQuestion(String gameId){
-        int questionIndex = currentQuestion.get(gameId);
-        try{
-            Game game = findById(gameId);
-            return game.getQuestions().get(questionIndex);
-        } catch (IndexOutOfBoundsException e){
-            return null;
-        }
-    }
+
+
+   public Question getCurrentQuestion(String gameId) {
+       int questionIndex = currentQuestion.get(gameId);
+       try {
+           Game game = findById(gameId);
+           return game.getQuestions().get(questionIndex);
+       } catch (IndexOutOfBoundsException e) {
+           return null;
+       }
+
+   }
+
 }
